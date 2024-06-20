@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode
+from textnode import TextNode, split_nodes_delimiter
 
 
 class TestTextNode(unittest.TestCase):
@@ -19,5 +19,20 @@ class TestTextNode(unittest.TestCase):
         node2 = TextNode("This is a text node", "italic", "https://www.boot.dev")
         self.assertEqual(node, node2)
 
+    def test_split_delimiter(self):
+        node = TextNode("This is text with a `code block` word", "text")
+        new_nodes = split_nodes_delimiter([node], "`", "code")
+        self.assertEqual(new_nodes, [
+            TextNode("This is text with a ", "text"),
+            TextNode("code block", "code"),
+            TextNode(" word", "text"),
+                                    ])
+    def test_non_matching_delimiters(self):
+        node = TextNode("Hello `world", "text")
+        with self.assertRaises(ValueError) as context:
+            split_nodes_delimiter([node], "`", "code")
+        self.assertEqual(str(context.exception), "Invalid markdown, formatted section not closed")
+         
+        
 if __name__ == "__main__":
     unittest.main()
