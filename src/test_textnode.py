@@ -1,6 +1,7 @@
 import unittest
 
-from textnode import TextNode, split_nodes_delimiter
+from textnode import TextNode
+from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links
 
 
 class TestTextNode(unittest.TestCase):
@@ -32,6 +33,17 @@ class TestTextNode(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             split_nodes_delimiter([node], "`", "code")
         self.assertEqual(str(context.exception), "Invalid markdown, formatted section not closed")
+
+    def test_extracing_images(self):
+        text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
+        matches = extract_markdown_images(text)
+        self.assertEqual(matches, [("image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"), ("another", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png")])
+
+    def test_extracting_links(self):
+        text = "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)"
+        matches = extract_markdown_links(text)
+        self.assertEqual(matches,[("link", "https://www.example.com"), ("another", "https://www.example.com/another")])
+
          
         
 if __name__ == "__main__":
