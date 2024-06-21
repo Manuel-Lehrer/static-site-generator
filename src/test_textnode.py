@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode
-from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links
+from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
 
 
 class TestTextNode(unittest.TestCase):
@@ -44,7 +44,30 @@ class TestTextNode(unittest.TestCase):
         matches = extract_markdown_links(text)
         self.assertEqual(matches,[("link", "https://www.example.com"), ("another", "https://www.example.com/another")])
 
-         
+    def test_split_images(self):
+        node = TextNode("This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and another ![second image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png)","text",)
         
+        new_nodes = split_nodes_image([node])
+        self.assertEqual(new_nodes, [
+                                    TextNode("This is text with an ", "text"),
+                                    TextNode("image", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+                                    TextNode(" and another ", "text"),
+                                    TextNode("second image", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png"),
+                                    ]
+                        )
+
+    def test_split_links(self):
+        node = TextNode("Check this [first link](https://example1.com) and this [second link](https://example2.com).", "text")
+        
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(new_nodes, [
+                                    TextNode("Check this ", "text"),
+                                    TextNode("first link", "link", "https://example1.com"),
+                                    TextNode(" and this ", "text"),
+                                    TextNode("second link", "link", "https://example2.com"),
+                                    TextNode(".", "text")
+                                    ]
+                        )
+
 if __name__ == "__main__":
     unittest.main()
