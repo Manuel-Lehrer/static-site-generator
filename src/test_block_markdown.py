@@ -1,5 +1,5 @@
 import unittest
-from block_markdown import markdown_to_blocks
+from block_markdown import markdown_to_blocks, block_to_block_type
 
 
 class TestMarkdownToHTML(unittest.TestCase):
@@ -39,5 +39,12 @@ class TestMarkdownToHTML(unittest.TestCase):
             """
         blocks = markdown_to_blocks(markdown)
         self.assertEqual(blocks, test_blocks)
+    
+    def test_block_to_block_type(self):
+        markdown ='''1. This
+                     2. is a
+                     3. ordered list
+                  '''
+        self.assertEqual(block_to_block_type(markdown), "ordered_list")
 
 
